@@ -33,7 +33,7 @@ export default function Landing() {
           className="w-full max-w-xs flex flex-col gap-6"
         >
           <Link 
-            to="/dashboard"
+            to="/onboarding"
             className="w-full bg-secondary-container text-on-secondary-container font-sans text-sm font-semibold tracking-widest uppercase rounded-full py-5 px-8 hover:bg-secondary-fixed transition-all flex justify-center items-center gap-2 group shadow-sm active:scale-95"
           >
             Get Started

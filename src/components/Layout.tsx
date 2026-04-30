@@ -1,11 +1,14 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import { Sidebar } from "./Sidebar";
 import { AddTransactionModal } from "./AddTransactionModal";
 import { Bell, Menu } from "lucide-react";
 import { cn } from "@/src/lib/utils";
+import { useApp } from "@/src/context/AppContext";
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { profile } = useApp();
 
   return (
     <div className="min-h-screen bg-background text-on-background selection:bg-secondary-container selection:text-on-secondary-container">
@@ -18,13 +21,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
           <button className="text-on-surface-variant hover:text-primary">
             <Bell className="w-5 h-5 stroke-[1.5px]" />
           </button>
-          <div className="w-8 h-8 rounded-full overflow-hidden border border-outline-variant">
-            <img 
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuAupAUagnx5EVOA2Q6HmFgQFgUJGyQp1GUOZrWB__0Rh3w9j_cK-UoLN-clsv-1CR1JK6ok2ay7CNCypr2ElyrP4aFA7w69Oh0C_mDUAPUUJK_4wqLvaUSQSUfwPOCDU3Iwiunvo2lq8Dl97IX3CK3n-lzVypro1yxHgfPNZk2bgeObOZR6VtFgWySD2xCR5Uir5GwZS7BPaINv70nxzbSx06CMlEBtcdjPO1SacbQIUf3xPkWYYHNyyHxYBx8R49x0JF28y1ybc1A" 
-              alt="Avatar"
-              className="w-full h-full object-cover"
-            />
-          </div>
+          <Link to="/settings" className="w-8 h-8 rounded-full border border-outline-variant flex items-center justify-center bg-surface text-lg hover:border-primary transition-all">
+            {profile.avatar}
+          </Link>
           <button className="text-on-surface-variant">
             <Menu className="w-6 h-6" />
           </button>
