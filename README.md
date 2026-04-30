@@ -1,20 +1,29 @@
 <div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+<h1>Spendly</h1>
+<p>A modern personal finance and expense tracking application.</p>
 </div>
 
-# Run and deploy your AI Studio app
+## Overview
 
-This contains everything you need to run your app locally.
-
-View your app in AI Studio: https://ai.studio/apps/c8a325f2-3406-4709-8464-727bda84f742
+Spendly helps you keep track of your finances intuitively. Built with Vite, React, Tailwind CSS, Motion, and Recharts, it provides an aesthetic and responsive user interface to manage your spending habits and financial goals effectively.
 
 ## Run Locally
 
-**Prerequisites:**  Node.js
-
+**Prerequisites:** Node.js
 
 1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+   ```bash
+   npm install
+   ```
+2. Run the development server:
+   ```bash
+   npm run dev
+   ```
+
+## Tech Stack
+
+- **Frontend:** React, Vite
+- **Styling:** Tailwind CSS
+- **Animations:** Motion
+- **Icons:** Lucide React
+- **Charts:** Recharts
