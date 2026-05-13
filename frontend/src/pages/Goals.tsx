@@ -9,7 +9,7 @@ const EMOJIS = ["✈️", "🏠", "🌿", "🚗", "💻", "🎓", "🏖️", "�
 
 // ─── Add Goal Modal ────────────────────────────────────────────────────────────
 function AddGoalModal({ onClose }: { onClose: () => void }) {
-  const { addGoal } = useApp();
+  const { addGoal, profile } = useApp();
   const [name, setName] = useState("");
   const [emoji, setEmoji] = useState("✈️");
   const [target, setTarget] = useState("");
@@ -36,7 +36,7 @@ function AddGoalModal({ onClose }: { onClose: () => void }) {
         <motion.div
           initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
           transition={{ type: "spring", damping: 30, stiffness: 300 }}
-          className="w-full max-w-md bg-surface/95 backdrop-blur-[32px] rounded-t-[32px] md:rounded-[32px] border-t md:border border-white/40 shadow-2xl pointer-events-auto p-8 md:p-10"
+          className="w-full max-w-md bg-surface/95 backdrop-blur-[32px] rounded-t-[32px] md:rounded-[32px] border-t md:border border-outline-variant/30 shadow-2xl pointer-events-auto p-8 md:p-10"
         >
           <header className="flex justify-between items-center mb-8">
             <button onClick={onClose} className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors text-on-surface-variant">
@@ -89,7 +89,7 @@ function AddGoalModal({ onClose }: { onClose: () => void }) {
                 Target Amount
               </label>
               <div className="relative">
-                <span className="absolute left-0 top-1/2 -translate-y-1/2 font-serif text-2xl text-on-surface-variant/30">$</span>
+                <span className="absolute left-0 top-1/2 -translate-y-1/2 font-serif text-2xl text-on-surface-variant/30">{profile.currency}</span>
                 <input
                   className={cn(
                     "w-full bg-transparent border-b pb-3 pl-7 font-sans text-lg text-on-surface focus:outline-none transition-colors placeholder:text-outline-variant/60",
@@ -128,7 +128,7 @@ function AddGoalModal({ onClose }: { onClose: () => void }) {
 
 // ─── Goal Detail Sheet ─────────────────────────────────────────────────────────
 function GoalDetailSheet({ goal, onClose }: { goal: Goal; onClose: () => void }) {
-  const { addGoalContribution, deleteGoal, formatCurrency } = useApp();
+  const { addGoalContribution, deleteGoal, formatCurrency, profile } = useApp();
   const [amount, setAmount] = useState("");
   const [note, setNote] = useState("");
   const [contributed, setContributed] = useState(false);
@@ -166,7 +166,7 @@ function GoalDetailSheet({ goal, onClose }: { goal: Goal; onClose: () => void })
         <motion.div
           initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
           transition={{ type: "spring", damping: 30, stiffness: 300 }}
-          className="w-full max-w-md bg-surface/95 backdrop-blur-[32px] rounded-t-[32px] md:rounded-[32px] border-t md:border border-white/40 shadow-2xl pointer-events-auto max-h-[90vh] overflow-y-auto no-scrollbar"
+          className="w-full max-w-md bg-surface/95 backdrop-blur-[32px] rounded-t-[32px] md:rounded-[32px] border-t md:border border-outline-variant/30 shadow-2xl pointer-events-auto max-h-[90vh] overflow-y-auto no-scrollbar"
         >
           <div className="p-8 md:p-10">
             {/* Header */}

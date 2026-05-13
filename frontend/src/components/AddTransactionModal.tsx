@@ -29,7 +29,7 @@ interface AddTransactionModalProps {
 }
 
 export function AddTransactionModal({ isOpen, onClose }: AddTransactionModalProps) {
-  const { addTransaction } = useApp();
+  const { addTransaction, profile } = useApp();
 
   const [type, setType] = useState<TransactionType>("expense");
   const [rawAmount, setRawAmount] = useState("");
@@ -119,7 +119,7 @@ export function AddTransactionModal({ isOpen, onClose }: AddTransactionModalProp
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
               transition={{ type: "spring", damping: 30, stiffness: 300 }}
-              className="w-full max-w-lg bg-surface/95 backdrop-blur-[32px] rounded-t-[32px] md:rounded-[32px] border-t md:border border-white/40 shadow-2xl pointer-events-auto flex flex-col pt-8 pb-12 px-6 md:px-10 max-h-[95vh] overflow-y-auto no-scrollbar"
+              className="w-full max-w-lg bg-surface/95 backdrop-blur-[32px] rounded-t-[32px] md:rounded-[32px] border-t md:border border-outline-variant/30 shadow-2xl pointer-events-auto flex flex-col pt-8 pb-12 px-6 md:px-10 max-h-[95vh] overflow-y-auto no-scrollbar"
             >
               <header className="flex justify-between items-center mb-10 shrink-0">
                 <button 
@@ -156,7 +156,7 @@ export function AddTransactionModal({ isOpen, onClose }: AddTransactionModalProp
                 {/* Amount Input */}
                 <div className="flex flex-col items-center justify-center py-4">
                   <div className="relative w-full max-w-[280px]">
-                    <span className="absolute left-0 top-1/2 -translate-y-1/2 font-serif text-5xl text-on-surface-variant/30 select-none">$</span>
+                    <span className="absolute left-0 top-1/2 -translate-y-1/2 font-serif text-5xl text-on-surface-variant/30 select-none">{profile.currency}</span>
                     <input 
                       autoFocus
                       className={cn(

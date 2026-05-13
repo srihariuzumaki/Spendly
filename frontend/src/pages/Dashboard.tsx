@@ -1,9 +1,12 @@
-import React, { useState, useMemo } from "react";
-import { Eye, EyeOff, Bell, Send, ArrowDown, CreditCard, QrCode, Store, Briefcase, Car, Coffee, Utensils, ShoppingBag, Home, Zap, Music, Heart, Plane, MoreHorizontal } from "lucide-react";
+import React, { useState, useMemo, useEffect } from "react";
+import { Eye, EyeOff, Bell, Plus, Camera, Target, Download, Users, Store, Briefcase, Car, Coffee, Utensils, ShoppingBag, Home, Zap, Music, Heart, Plane, MoreHorizontal, Moon, Sun } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
 import { cn } from "@/src/lib/utils";
 import { useApp, formatDate, TransactionCategory } from "@/src/context/AppContext";
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
+import { SplitExpenseModal } from "@/src/components/SplitExpenseModal";
+import { ExportModal } from "@/src/components/ExportModal";
 
 // Icon map for categories
 const CATEGORY_ICONS: Record<TransactionCategory, React.ComponentType<{ className?: string }>> = {
@@ -35,12 +38,41 @@ function getTimeGreeting(): string {
 }
 
 export default function Dashboard() {
-  const { profile, transactions, totalBalance, thisMonthIncome, thisMonthExpenses, formatCurrency } = useApp();
+  const { profile, transactions, totalBalance, thisMonthIncome, thisMonthExpenses, formatCurrency, theme, toggleTheme } = useApp();
   const [balanceHidden, setBalanceHidden] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
+  const [clearedNotifs, setClearedNotifs] = useState(false);
+  const [hiddenNotifList, setHiddenNotifList] = useState(false);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
 
   // Recent 4 transactions
   const recentTxs = useMemo(() => transactions.slice(0, 4), [transactions]);
+
+  // Reset notification state if a new transaction arrives
+  useEffect(() => {
+    const topId = recentTxs[0]?.id;
+    if (topId) {
+      setClearedNotifs(localStorage.getItem("spendly_cleared_tx") === topId);
+      setHiddenNotifList(localStorage.getItem("spendly_hidden_tx") === topId);
+    }
+  }, [recentTxs]);
+
+  const handleMarkAsRead = () => {
+    setClearedNotifs(true);
+    setNotifOpen(false);
+    if (recentTxs.length > 0) {
+      localStorage.setItem("spendly_cleared_tx", recentTxs[0].id);
+    }
+  };
+
+  const handleClearNotifs = () => {
+    setClearedNotifs(true);
+    setHiddenNotifList(true);
+    if (recentTxs.length > 0) {
+      localStorage.setItem("spendly_cleared_tx", recentTxs[0].id);
+      localStorage.setItem("spendly_hidden_tx", recentTxs[0].id);
+    }
+  };
 
   // Spending by category (this month)
   const categoryBreakdown = useMemo(() => {
@@ -55,6 +87,7 @@ export default function Dashboard() {
       .slice(0, 3)
       .map(([cat, val]) => ({
         label: cat,
+        value: val,
         color: CATEGORY_COLORS[cat as TransactionCategory]?.split(" ")[0] ?? "bg-surface-variant",
         percentage: total > 0 ? Math.round((val / total) * 100) : 0,
       }));
@@ -81,28 +114,28 @@ export default function Dashboard() {
 
   const quickActions = [
     {
-      icon: Send,
-      label: "Send",
+      icon: Plus,
+      label: "Add Entry",
       color: "bg-secondary-container text-on-secondary-container",
-      onClick: () => alert("Send money — coming soon!"),
+      onClick: () => alert("Use the sidebar/nav to add a transaction!"),
     },
     {
-      icon: ArrowDown,
-      label: "Receive",
+      icon: Camera,
+      label: "Scan Receipt",
       color: "bg-tertiary-fixed text-on-tertiary-fixed",
-      onClick: () => alert("Receive — coming soon!"),
+      onClick: () => alert("AI Receipt Scanner — coming soon!"),
     },
     {
-      icon: CreditCard,
-      label: "Pay",
+      icon: Target,
+      label: "Set Budget",
       color: "bg-error-container text-on-error-container",
-      onClick: () => alert("Pay bill — coming soon!"),
+      onClick: () => alert("Category Budgets — coming soon!"),
     },
     {
-      icon: QrCode,
-      label: "Scan",
+      icon: Download,
+      label: "Export",
       color: "bg-surface-container-high text-on-surface-variant",
-      onClick: () => alert("QR Scan — coming soon!"),
+      onClick: () => setIsExportModalOpen(true),
     },
   ];
 
@@ -111,11 +144,34 @@ export default function Dashboard() {
       {/* Header Section */}
       <header className="flex justify-between items-end">
         <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
-          <h1 className="font-serif text-4xl text-primary">{getTimeGreeting()}, {profile.name} 👋</h1>
+          <h1 className="font-serif text-4xl text-primary">{getTimeGreeting()}, {profile.name} </h1>
           <p className="font-sans text-sm text-on-surface-variant/80 mt-2">Here is a summary of your financial wellness today.</p>
         </motion.div>
         
         <div className="hidden lg:flex items-center gap-6">
+          {/* Theme Switch */}
+          <button
+            onClick={toggleTheme}
+            className="w-12 h-12 rounded-full border border-outline-variant flex items-center justify-center text-on-surface-variant hover:text-primary transition-all relative overflow-hidden group space-x-1"
+          >
+            <motion.div
+              initial={false}
+              animate={{ rotate: theme === "dark" ? 90 : 0, scale: theme === "dark" ? 0 : 1, opacity: theme === "dark" ? 0 : 1 }}
+              transition={{ type: "spring", stiffness: 300, damping: 20 }}
+              className="absolute"
+            >
+              <Moon className="w-5 h-5 stroke-[1.5px]" />
+            </motion.div>
+            <motion.div
+              initial={false}
+              animate={{ rotate: theme === "dark" ? 0 : -90, scale: theme === "dark" ? 1 : 0, opacity: theme === "dark" ? 1 : 0 }}
+              transition={{ type: "spring", stiffness: 300, damping: 20 }}
+              className="absolute"
+            >
+              <Sun className="w-5 h-5 stroke-[1.5px]" />
+            </motion.div>
+          </button>
+
           {/* Notification Bell */}
           <div className="relative">
             <button
@@ -123,7 +179,7 @@ export default function Dashboard() {
               className="w-12 h-12 rounded-full border border-outline-variant flex items-center justify-center text-on-surface-variant hover:text-primary transition-all"
             >
               <Bell className="w-5 h-5 stroke-[1.5px]" />
-              {recentTxs.length > 0 && (
+              {recentTxs.length > 0 && !clearedNotifs && (
                 <span className="absolute -top-1 -right-1 w-4 h-4 bg-error text-on-error text-[8px] font-bold rounded-full flex items-center justify-center">
                   {Math.min(recentTxs.length, 9)}
                 </span>
@@ -137,34 +193,65 @@ export default function Dashboard() {
                   exit={{ opacity: 0, y: 8, scale: 0.95 }}
                   className="absolute right-0 top-14 w-72 bg-surface/95 backdrop-blur-2xl border border-outline-variant/30 rounded-[20px] shadow-2xl p-4 z-50"
                 >
-                  <p className="font-sans text-[10px] font-bold text-on-surface-variant uppercase tracking-[0.2em] mb-3">Recent Activity</p>
-                  {recentTxs.slice(0, 3).map((tx) => {
-                    const Icon = CATEGORY_ICONS[tx.category] ?? Store;
-                    return (
-                      <div key={tx.id} className="flex items-center gap-3 py-2 border-b border-outline-variant/10 last:border-0">
-                        <div className={cn("w-8 h-8 rounded-full flex items-center justify-center shrink-0", CATEGORY_COLORS[tx.category])}>
-                          <Icon className="w-4 h-4" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="font-sans text-xs font-semibold text-on-surface truncate">{tx.merchant}</p>
-                          <p className="font-sans text-[9px] text-on-surface-variant/60 uppercase tracking-widest">{formatDate(tx.date)}</p>
-                        </div>
-                        <span className={cn("font-serif text-sm", tx.type === "income" ? "text-tertiary" : "text-primary")}>
-                          {tx.type === "income" ? "+" : "-"}{formatCurrency(tx.amount)}
-                        </span>
+                  <div className="flex justify-between items-center mb-3">
+                    <p className="font-sans text-[10px] font-bold text-on-surface-variant uppercase tracking-[0.2em]">Recent Activity</p>
+                    {!clearedNotifs && recentTxs.length > 0 && (
+                      <button 
+                        onClick={handleMarkAsRead}
+                        className="font-sans text-[10px] font-semibold text-primary hover:text-primary/80 transition-colors uppercase tracking-wider"
+                      >
+                        Mark as Read
+                      </button>
+                    )}
+                  </div>
+                  
+                  {(!hiddenNotifList && recentTxs.length > 0) ? (
+                    <>
+                      {recentTxs.slice(0, 3).map((tx) => {
+                        const Icon = CATEGORY_ICONS[tx.category] ?? Store;
+                        return (
+                          <div key={tx.id} className="flex items-center gap-3 py-2 border-b border-outline-variant/10 last:border-0">
+                            <div className={cn("w-8 h-8 rounded-full flex items-center justify-center shrink-0", CATEGORY_COLORS[tx.category])}>
+                              <Icon className="w-4 h-4" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="font-sans text-xs font-semibold text-on-surface truncate">{tx.merchant}</p>
+                              <p className="font-sans text-[9px] text-on-surface-variant/60 uppercase tracking-widest">{formatDate(tx.date)}</p>
+                            </div>
+                            <span className={cn("font-serif text-sm", tx.type === "income" ? "text-tertiary" : "text-primary")}>
+                              {tx.type === "income" ? "+" : "-"}{formatCurrency(tx.amount)}
+                            </span>
+                          </div>
+                        );
+                      })}
+                      <div className="flex gap-2 mt-2 pt-3 border-t border-outline-variant/10">
+                        <button 
+                          onClick={handleClearNotifs}
+                          className="flex-1 font-sans text-[10px] text-error hover:text-error/80 transition-colors uppercase tracking-widest text-center"
+                        >
+                          Clear
+                        </button>
+                        <button className="flex-1 font-sans text-[10px] text-on-surface-variant hover:text-primary transition-colors uppercase tracking-widest text-center">
+                          <Link to="/transactions" onClick={() => setNotifOpen(false)}>View all</Link>
+                        </button>
                       </div>
-                    );
-                  })}
-                  <button className="w-full pt-3 font-sans text-[10px] text-on-surface-variant hover:text-primary transition-colors uppercase tracking-widest text-center">
-                    <Link to="/transactions">View all</Link>
-                  </button>
+                    </>
+                  ) : (
+                    <div className="py-6 text-center">
+                      <p className="font-sans text-xs font-bold text-on-surface-variant/60 uppercase tracking-wider">No new notifications</p>
+                    </div>
+                  )}
                 </motion.div>
               )}
             </AnimatePresence>
           </div>
 
-          <Link to="/settings" className="w-12 h-12 rounded-full border border-outline-variant shadow-sm flex items-center justify-center bg-surface text-2xl hover:border-primary transition-all">
-            {profile.avatar}
+          <Link to="/settings" className="w-12 h-12 rounded-full border border-outline-variant shadow-sm flex items-center justify-center bg-surface text-2xl hover:border-primary overflow-hidden transition-all">
+            {profile.avatar && (profile.avatar.startsWith('data:') || profile.avatar.startsWith('http')) ? (
+              <img src={profile.avatar} alt="User avatar" className="w-full h-full object-cover" />
+            ) : (
+              profile.avatar || "👤"
+            )}
           </Link>
         </div>
       </header>
@@ -234,15 +321,56 @@ export default function Dashboard() {
           </div>
           
           <div className="flex flex-col items-center">
-            {/* Live Donut */}
-            <div className="relative w-52 h-52 rounded-full flex items-center justify-center shadow-sm" style={{ background: donutGradient }}>
-              <div className="w-36 h-36 bg-background rounded-full flex flex-col items-center justify-center shadow-inner">
+            {/* Live Chart */}
+            <div className="relative w-52 h-52 flex items-center justify-center">
+              <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-0">
                 <span className="font-sans text-[10px] font-medium text-on-surface-variant uppercase tracking-widest">Spent</span>
                 <span className="font-serif text-3xl text-primary mt-1">
                   {formatCurrency(
                     transactions.filter((t) => t.type === "expense").reduce((s, t) => s + t.amount, 0)
                   ).split(".")[0]}
                 </span>
+              </div>
+              
+              <div className="w-full h-full z-10">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={categoryBreakdown.length > 0 ? categoryBreakdown : [{ label: "No Expenses", value: 1, isEmpty: true }]}
+                      innerRadius={70}
+                      outerRadius={100}
+                      paddingAngle={2}
+                      dataKey="value"
+                      nameKey="label"
+                      stroke="none"
+                    >
+                      {categoryBreakdown.length > 0 ? (
+                        categoryBreakdown.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={donutColors[index % donutColors.length]} />
+                        ))
+                      ) : (
+                        <Cell fill="#e5e2de" />
+                      )}
+                    </Pie>
+                    <Tooltip 
+                      content={({ active, payload }) => {
+                        if (active && payload && payload.length) {
+                          return (
+                            <div className="bg-surface/90 backdrop-blur-md px-4 py-3 rounded-[16px] shadow-lg border border-outline-variant/30 flex flex-col gap-1">
+                              <span className="font-sans text-[10px] uppercase tracking-widest text-on-surface-variant font-bold">
+                                {payload[0].name || payload[0].payload.label}
+                              </span>
+                              <span className="font-serif text-lg text-primary">
+                                {payload[0].payload.isEmpty ? formatCurrency(0) : formatCurrency(payload[0].value as number)}
+                              </span>
+                            </div>
+                          );
+                        }
+                        return null;
+                      }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
               </div>
             </div>
 
@@ -302,6 +430,8 @@ export default function Dashboard() {
           </div>
         </section>
       </div>
+
+      <ExportModal isOpen={isExportModalOpen} onClose={() => setIsExportModalOpen(false)} />
     </div>
   );
 }

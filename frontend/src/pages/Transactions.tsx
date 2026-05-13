@@ -56,7 +56,7 @@ function TransactionSheet({ tx, onClose, onDelete }: { tx: Transaction; onClose:
         <motion.div
           initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
           transition={{ type: "spring", damping: 30, stiffness: 300 }}
-          className="w-full max-w-md bg-surface/95 backdrop-blur-[32px] rounded-t-[32px] md:rounded-[32px] border-t md:border border-white/40 shadow-2xl pointer-events-auto p-8 md:p-10"
+          className="w-full max-w-md bg-surface/95 backdrop-blur-[32px] rounded-t-[32px] md:rounded-[32px] border-t md:border border-outline-variant/30 shadow-2xl pointer-events-auto p-8 md:p-10"
         >
           <div className="flex flex-col items-center gap-6 mb-10">
             <div className={cn("w-20 h-20 rounded-full flex items-center justify-center shadow-inner", colClass)}>
@@ -217,7 +217,7 @@ export default function Transactions() {
                         exit={{ opacity: 0, x: -40, height: 0 }}
                         whileHover={{ y: -4 }}
                         onClick={() => setSelectedTx(tx)}
-                        className="flex items-center justify-between p-8 glass-card rounded-[24px] group cursor-pointer transition-all hover:bg-white/60"
+                        className="flex items-center justify-between p-8 glass-card rounded-[24px] group cursor-pointer transition-all hover:bg-surface-container-highest/80"
                       >
                         <div className="flex items-center gap-8">
                           <div className={cn("w-14 h-14 rounded-full flex items-center justify-center shadow-inner shrink-0", colClass)}>

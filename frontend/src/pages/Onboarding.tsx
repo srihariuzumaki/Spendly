@@ -110,7 +110,7 @@ export default function Onboarding() {
     if (step < ONBOARDING_STEPS.length - 1) {
       setStep(step + 1);
     } else {
-      navigate("/setup-profile");
+      navigate("/signup");
     }
   };
 
@@ -166,7 +166,7 @@ export default function Onboarding() {
         {/* Controls */}
         <div className="w-full flex items-center justify-between mt-8 pt-8 border-t border-outline-variant/20">
           <button 
-            onClick={() => navigate("/dashboard")}
+            onClick={() => navigate("/login")}
             className="text-sm font-sans tracking-widest uppercase text-outline hover:text-primary transition-colors py-2"
           >
             Skip

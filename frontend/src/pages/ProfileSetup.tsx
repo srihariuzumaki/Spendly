@@ -1,7 +1,7 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { motion } from "motion/react";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, User } from "lucide-react";
+import { ArrowRight, User, Camera } from "lucide-react";
 import { cn } from "@/src/lib/utils";
 import { useApp } from "@/src/context/AppContext";
 
@@ -23,6 +23,21 @@ export default function ProfileSetup() {
   const [avatar, setAvatar] = useState(profile.avatar || "👤");
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) {
+        alert("Image should be less than 2MB");
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setAvatar(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleSave = () => {
     if (!name.trim()) {
@@ -66,10 +81,20 @@ export default function ProfileSetup() {
         >
           {/* Avatar Selection */}
           <div className="flex flex-col items-center gap-4">
-            <div className="text-6xl mb-2 select-none relative">
-              {avatar}
+            <div className="relative mb-2">
+              {avatar.startsWith("data:") || avatar.startsWith("http") ? (
+                <img src={avatar} alt="Avatar" className="w-24 h-24 rounded-full object-cover border-4 border-primary/20 shadow-xl" />
+              ) : (
+                <div className="text-6xl select-none">{avatar}</div>
+              )}
             </div>
-            <div className="flex flex-wrap justify-center gap-2 max-w-[280px]">
+            <div className="flex flex-wrap justify-center items-center gap-2 max-w-[280px]">
+              {/* Upload Button */}
+              <label className="flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 text-primary cursor-pointer hover:bg-primary/20 transition-all ring-1 ring-primary/30">
+                <Camera className="w-5 h-5" />
+                <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+              </label>
+              
               {AVATARS.map((emoji) => (
                 <button
                   key={emoji}

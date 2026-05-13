@@ -6,7 +6,8 @@ import {
   User, 
   HelpCircle, 
   LogOut, 
-  Plus
+  Plus,
+  Ghost
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/src/lib/utils";
@@ -16,6 +17,7 @@ const navItems = [
   { icon: ListOrdered, label: "Transactions", href: "/transactions" },
   { icon: BarChart3, label: "Analytics", href: "/analytics" },
   { icon: Target, label: "Goals", href: "/goals" },
+  { icon: Ghost, label: "Subscriptions", href: "/subscriptions" },
   { icon: User, label: "Settings", href: "/settings" },
 ];
 
@@ -24,11 +26,22 @@ const footerItems = [
   { icon: LogOut, label: "Sign Out", href: "/sign-out" },
 ];
 
-export function Sidebar({ onAddClick }: { onAddClick: () => void }) {
+export function Sidebar({ onAddClick, isOpen, onClose }: { onAddClick: () => void; isOpen?: boolean; onClose?: () => void }) {
   const location = useLocation();
 
   return (
-    <nav className="hidden lg:flex flex-col h-screen w-72 fixed left-0 top-0 border-r border-outline-variant/30 bg-surface/70 backdrop-blur-3xl px-6 py-12 z-50">
+    <>
+      {/* Mobile Overlay */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden backdrop-blur-sm" 
+          onClick={onClose} 
+        />
+      )}
+      <nav className={cn(
+        "flex flex-col h-screen w-72 fixed left-0 top-0 border-r border-outline-variant/30 bg-surface/95 backdrop-blur-3xl px-6 py-12 z-50 transition-transform duration-300",
+        isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+      )}>
       <div className="mb-8">
         <h1 className="font-serif italic text-3xl text-primary mb-2">Spendly</h1>
         <p className="font-sans text-[10px] tracking-widest uppercase text-on-surface-variant/60">
@@ -78,5 +91,6 @@ export function Sidebar({ onAddClick }: { onAddClick: () => void }) {
         ))}
       </div>
     </nav>
+    </>
   );
 }

@@ -1,20 +1,10 @@
 import React, { useState } from "react";
 import { motion } from "motion/react";
-import { User, DollarSign, Image as ImageIcon, Check, Trash2, Moon, Sun, Bell } from "lucide-react";
-import { useApp } from "@/src/context/AppContext";
+import { User, DollarSign, Image as ImageIcon, Check, Trash2, Moon, Sun, Bell, Camera } from "lucide-react";
+import { useApp, CURRENCIES } from "@/src/context/AppContext";
 import { cn } from "@/src/lib/utils";
 
 const EMOJIS = ["😎", "😊", "🤩", "🚀", "🦄", "🐶", "🐱", "☕", "🍔", "🍕", "🎸", "🎮", "✈️", "🏖️", "💎", "🌟"];
-const CURRENCIES = [
-  { symbol: "$", code: "USD", name: "US Dollar" },
-  { symbol: "€", code: "EUR", name: "Euro" },
-  { symbol: "£", code: "GBP", name: "British Pound" },
-  { symbol: "¥", code: "JPY", name: "Japanese Yen" },
-  { symbol: "₹", code: "INR", name: "Indian Rupee" },
-  { symbol: "A$", code: "AUD", name: "Australian Dollar" },
-  { symbol: "C$", code: "CAD", name: "Canadian Dollar" },
-  { symbol: "Fr", code: "CHF", name: "Swiss Franc" },
-];
 
 export default function Settings() {
   const { profile, updateProfile } = useApp();
@@ -27,6 +17,21 @@ export default function Settings() {
   // Settings Toggles (Mock state for pure UI functionality)
   const [darkMode, setDarkMode] = useState(false);
   const [notifications, setNotifications] = useState(true);
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) {
+        alert("Image should be less than 2MB");
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setAvatar(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleSave = () => {
     updateProfile({ name, avatar, currency });
@@ -71,7 +76,21 @@ export default function Settings() {
                 <label className="font-sans text-[10px] font-bold text-on-surface-variant uppercase tracking-widest flex items-center gap-2">
                   <ImageIcon className="w-3 h-3" /> Avatar
                 </label>
-                <div className="grid grid-cols-4 gap-2 w-max">
+                
+                {/* Current Avatar Display */}
+                <div className="flex items-center gap-4 mb-2">
+                  {avatar.startsWith("data:") || avatar.startsWith("http") ? (
+                    <img src={avatar} alt="Avatar" className="w-16 h-16 rounded-full object-cover border-2 border-outline-variant/30" />
+                  ) : (
+                    <div className="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center text-4xl">{avatar}</div>
+                  )}
+                  <label className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary-container text-on-primary-container text-xs font-bold uppercase tracking-widest cursor-pointer hover:bg-primary/20 transition-all">
+                    <Camera className="w-4 h-4" /> Upload
+                    <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+                  </label>
+                </div>
+
+                <div className="grid grid-cols-4 gap-2 w-max mt-4">
                   {EMOJIS.map((emoji) => (
                     <button
                       key={emoji}
